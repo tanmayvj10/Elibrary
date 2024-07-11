@@ -1,0 +1,152 @@
+{%extends 'lib_layout.html'%}
+{% block content %}
+
+<div class="navbar" id="navbar">
+    <div id="incontainer">
+        <div id="heading">
+            <h4>ELIBRARY</h4>
+        </div>
+        <div id="dashhead">
+            <h3><i>LIBRARIAN DASHBOARD</i></h3>
+        </div>
+        <div id="nav">
+            <a href="/lib_profile" class="btn btn-outline-light">PROFILE</a>
+            <a href="/book_access" class="btn btn-light"><b>BOOK ACCESS</b></a>
+            <a href="/librarian_dashboard" class="btn btn-outline-light ">HOME</a>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="left-column">
+        <h2>Books Issued</h2>
+        <table class="table table-hover table-dark">
+            <thead class="table-light">
+                <tr>
+                    <th>Username</th>
+                    <th>Book ID</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in book_iss %}
+                <tr>
+                    <td>{{ book.username }}</td>
+                    <td>{{ book.book_id }}</td>
+                    <td>
+                        <form action="/revoke_book_access" method="post"
+                            onsubmit="return confirm('Are you sure you want to revoke ?');">
+                            <input type="hidden" name="user_id" value="{{ book.id }}">
+                            <input type="hidden" name="book_id" value="{{ book.book_id }}"><button class="button">Revoke
+                                Access</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="right-column">
+        <h2>Revoke Access</h2>
+        <form action="/revoke_book_access" method="post"
+            onsubmit="return confirm('Are you sure you want to revoke ?');">
+            <label for="user_id">UserID:</label>
+            <input type="text" id="user_id" name="user_id" placeholder="user" style="height:40px;" class="btn btn-dark"
+                required>
+            <label for="book_id">Book ID:</label>
+            <input type="text" id="book_id" name="book_id" style="height:40px;" class="btn btn-dark" required>
+            <button type="submit" class="button" style="margin-top:10px;">Revoke Access</button>
+        </form>
+        <h2>Book Requests</h2>
+
+        <table class="table table-hover table-dark">
+            <thead class="table-light">
+                <tr>
+                    <th>Username</th>
+                    <th>Book ID</th>
+                    <th>Issue Duration</th>
+                    <th colspan="2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in book_req %}
+                <tr>
+                    <td>{{ request.username }}</td>
+                    <td>{{ request.book_id }}</td>
+                    <td>{{ request.days }} days</td>
+                    <td>
+                        <form action="/grant_book_access" method="post">
+
+                            <input type="hidden" name="user_id" value="{{ request.id }}">
+                            <input type="hidden" name="book_id" value="{{ request.book_id }}">
+                            <button type="submit" class="button">Grant</button>
+                        </form>
+
+                    </td>
+                    <td>
+                        <form action="/discard_access" method="post">
+                            <input type="hidden" name="user_id" value="{{ request.id }}">
+                            <input type="hidden" name="book_id" value="{{ request.book_id }}">
+                            <button class="button">Discard</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .container {
+        display: flex;
+    }
+
+    .left-column,
+    .right-column {
+        width: 50%;
+        padding: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    .button {
+        padding: 10px 20px;
+        background-color: #000000;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .button:hover {
+        background-color: #cacaca;
+        color: black;
+    }
+
+
+
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+{% endblock %}

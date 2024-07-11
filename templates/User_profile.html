@@ -1,0 +1,341 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+User Profile
+{% endblock %}
+
+{% block content %}
+<div class="navbar" id="navbar">
+    <div id="incontainer">
+        <div id="heading">
+            <h4>ELIBRARY</h4>
+        </div>
+        <div id="dashhead">
+            <h3><i>USER DASHBOARD</i></h3>
+        </div>
+        <div id="nav"><a href="" class="btn btn-light"><b>PROFILE</b></a>
+            <a href="/mybooks" class="btn btn-outline-light">MY BOOKS</a>
+            <a href="/dashboard" class="btn btn-outline-light">HOME</a>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="left-column">
+        <h2>@ {{ user.username }}</h2>
+        <img src="{{ url_for('static', filename=user.user_img) }}" alt="User Photo">
+        <form action="/upload_photo" method="post" enctype="multipart/form-data" class="upload_photo">
+            <input type="hidden" name="user_id" value="{{user.id}}">
+            <input type="file" id="photo" name="photo">
+            <button type="submit" class="btn btn-outline-light">Upload</button>
+        </form>
+
+        <div class="button-group">
+            {% if prime_check %}
+            <form action="/unsubscribe/{{user.id}}" method="post"
+                onsubmit="return confirm('Are you sure you want to unsubsribe ?');">
+                <button type="submit" class="btn btn-outline-light">Unsubscribe</button>
+            </form>
+            {% elif prime_req_check %}
+            <p class="btn btn-dark"> Subsription Requested</p>
+            {% else %}
+            <form action="/subscribe/{{user.id}}" method="post">
+                <button type="submit" class="btn btn-outline-light">Subscribe</button>
+            </form>
+            {% endif %}
+            <form action="/logout" method="post" onsubmit="return confirm('Are you sure you want to logout ?');">
+                <button type="submit" class="btn btn-outline-light">Logout</button>
+            </form>
+
+        </div>
+        <form action="/update_profile" method="post" class="update_profile">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{ user.name }}" class="btn btn-dark" required>
+            <label for="current_password">Current Password:</label>
+            <input type="password" id="current_password" name="current_password" class="btn btn-dark" required>
+            <label for="new_password">New Password:</label>
+            <input type="password" id="new_password" name="new_password" class="btn btn-dark">
+            <button type="submit" class="btn btn-outline-light">Update</button>
+        </form>
+        <form action="/delete_account" method="POST">
+            <input type="hidden" name="user_id" value="{{ user.id }}">
+            <input type="hidden" name="role" value="user">
+            <button type="submit" onclick="return confirm('Are you sure you want to delete account ?');"
+                class="btn btn-outline-light">Delete Account</button>
+        </form>
+    </div>
+    <div class="center-column">
+        <h2>Sections you read</h2>
+        <div id="piechart" style="width: 650px; height: 500px;"></div>
+
+    </div>
+    <div class="right-column">
+        <h2>Favourite Books</h2>
+        <div class="table-container">
+            <table class="table table-dark  table-hover table-borderless">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fav_book in favorite_books_details %}
+                    <tr>
+                        <td>{{ fav_book.title }}</td>
+                        <td>{{ fav_book.author }}</td>
+                        <td>
+                            <form action="/remove_favorite" method="post"
+                                onsubmit="return confirm('Are you sure you want to remove from favourites ?');">
+                                <input type="hidden" name="book_id" value="{{ fav_book.id }}">
+                                <button type="submit" class="btn btn-outline-danger">Remove</button>
+                            </form>
+                        </td>
+                        <td>
+
+                            <form action="/book/{{fav_book.id}}" method="post">
+                                <button type="submit" class="btn btn-outline-light">More</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <h2>Books Read</h2>
+        <div class="table-container">
+            <table class="table table-dark  table-hover table-borderless">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for completed_book in completed_books_details %}
+                    <tr>
+                        <td>{{ completed_book.title }}</td>
+                        <td>{{ completed_book.author }}</td>
+                        <td>
+                            <form action="/remove_from_completed/{{ completed_book.book_id }}" method="post"
+                                onsubmit="return confirm('Are you sure you want to mark as incomplete ?');">
+                                <input type="hidden" name="book_id" value="{{ completed_book.book_id }}">
+                                <input type="hidden" name="user_id" value="{{ user.id }}">
+                                <button type="submit" class="btn btn-outline-danger">Remove </button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/add_favourite/{{completed_book.book_id}}" method="post">
+                                <input type="hidden" name="book_id" value="{{ completed_book.book_id }}">
+                                <input type="hidden" name="user_id" value="{{ user.id }}">
+                                <button type="submit" class="btn btn-outline-light">Add to Favourite</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    a {
+        display: flex;
+        margin-inline: 25px;
+        padding: 10px;
+        padding-inline: 20px;
+        border-radius: 15px;
+        width: 100%;
+        justify-content: center;
+        text-decoration: none;
+        color: #000000;
+        background-color: #ffffff;
+        font-weight: bold;
+    }
+
+    a:hover {
+        background-color: #000000;
+        color: #ffffff;
+    }
+
+    .selected {
+        background-color: blueviolet;
+        font-weight: bold;
+    }
+
+
+    .container {
+        display: flex;
+        padding: 20px;
+        max-width: none;
+    }
+
+    .left-column,
+    .center-column,
+    .right-column {
+        margin-inline: 20px;
+        padding: 20px;
+        box-shadow: 0px 0px 10px grey;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+    }
+
+    .left-column {
+        flex: 2;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .upload_photo {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+
+    img {
+        max-height: 250px;
+        min-height: 250px;
+        max-width: auto;
+    }
+
+    .upload_photo input[type="file"] {
+        flex: 1;
+    }
+
+    .upload_photo button {
+        margin-left: 10px;
+        margin-top: 10px;
+    }
+
+    .update_profile button {
+        margin-left: 150px;
+    }
+
+    input[type=file]::file-selector-button {
+        margin-right: 20px;
+        border: none;
+        background: #131313;
+        padding: 10px 20px;
+        border-radius: 10px;
+        color: #fff;
+    }
+
+    input[type=file]::file-selector-button:hover {
+        background: #f3f3f4;
+        color: black;
+    }
+
+    .button-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .button-group form,
+    p {
+        margin-right: 10px;
+    }
+
+    .button-group p {
+        margin-bottom: 30px;
+    }
+
+
+    .center-column {
+        flex: 5;
+    }
+
+    .right-column {
+        flex: 3;
+    }
+
+    .left-column:hover,
+    .center-column:hover,
+    .right-column:hover {
+        scale: 1.01;
+    }
+
+
+    img {
+        max-width: 100%;
+        height: auto;
+
+    }
+
+    button {
+        margin-bottom: 10px;
+    }
+
+    form {
+        margin-bottom: 20px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    h2 {
+        margin-bottom: 10px;
+    }
+
+    .table-container {
+        max-height: 200px;
+        overflow: auto;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th {
+        padding: 8px;
+        text-align: left;
+        color: black;
+    }
+
+    td {
+        padding: 8px;
+        text-align: left;
+        color: rgb(255, 255, 255);
+    }
+</style>
+{% endblock %}
+
+{%block script%}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+
+        var data_list = [
+            ['Sections', 'Count'],
+            {% for item in data_list[0:] %}
+    {{ item | tojson }},
+    {% endfor %}];
+
+    var data = google.visualization.arrayToDataTable(data_list);
+    var options = {
+        'chartArea': { left: 10, top: 20, 'width': '100%', 'height': '80%' }, backgroundColor: { fill: "transparent" }, is3D: 'False', legend: { position: 'bottom', textStyle: { color: 'gray' } }
+
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+    chart.draw(data, options);
+      }
+</script>
+{%endblock%}

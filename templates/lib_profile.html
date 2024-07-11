@@ -1,0 +1,178 @@
+{% extends 'lib_layout.html' %}
+
+{% block content %}
+
+<div class="navbar" id="navbar">
+    <div id="incontainer">
+        <div id="heading">
+            <h4>ELIBRARY</h4>
+        </div>
+        <div id="dashhead">
+            <h3><i>LIBRARIAN DASHBOARD</i></h3>
+        </div>
+        <div id="nav"><a href="/lib_profile" class="btn btn-light"><b>PROFILE</b></a>
+            <a href="/book_access" class="btn btn-outline-light">BOOK ACCESS</a>
+            <a href="/librarian_dashboard" class="btn btn-outline-light ">HOME</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="left-column">
+        <h2>Librarian Details</h2>
+        <p>ID: {{ lib.lib_id }}</p>
+        <img src="{{ url_for('static', filename=lib.lib_img )}}" alt="Librarian Photo">
+        <form action="/upload_photo_lib" method="post" enctype="multipart/form-data" class="upload_photo">
+            <input type="hidden" name="lib_id" value="{{lib.lib_id}}">
+            <label for="photo">Upload Profile Photo:</label>
+            <input type="file" id="photo" name="photo">
+            <button type="submit" class="btn btn-outline-light">Upload</button>
+        </form>
+
+
+        <!-- Logout Button -->
+        <div class="button-group"></div>
+        <form action="/logout" method="POST" onsubmit="return confirm('Are you sure you want to logout ?');">
+            <button type="submit" class="btn btn-outline-light">Logout</button>
+        </form>
+        <!-- Form to update librarian password -->
+        <form action="/update_password" method="POST">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{ lib.name }}" c>
+            <label for="current_password">Current Password:</label>
+            <input type="password" id="current_password" name="current_password" class="btn btn-dark">
+            <label for="new_password">New Password:</label>
+            <input type="password" id="new_password" name="new_password" class="btn btn-dark">
+            <button type="submit" class="btn btn-outline-light">Update</button>
+        </form>
+        <!-- Delete Account Button -->
+        <form action="/delete_account" method="POST">
+            <input type="hidden" name="lib_id" value="{{ lib.lib_id }}">
+            <input type="hidden" name="role" value="lib">
+
+            <button type="submit" class="btn btn-outline-light"
+                onclick="return confirm('Are you sure you want to delete account ?');">Delete Account</button>
+        </form>
+    </div>
+
+    <div class="right-column">
+        <h2>Sections Created by Librarian</h2>
+        <hr>
+        <ul class="list-group list-group-numbered">
+            {% for section in lib_sections %}
+            <li class="list-group-item list-group-item-dark list-group-item-action">{{ section.section }}</li>
+            {% endfor %}
+        </ul>
+        <br>
+        <h2>Books Added by Librarian</h2>
+        <hr>
+        <ul class="list-group list-group-numbered">
+            {% for book in lib_books %}
+            <li class="list-group-item list-group-item-secondary list-group-item-action"><b>{{ book.book_title }} </b>
+                by <i> {{ book.author }}</i></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block style %}
+<style>
+    .container {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+        max-width: none;
+    }
+
+    .left-column,
+    .right-column {
+        margin: 30px;
+        margin-top: 20px;
+        padding: 20px;
+        box-shadow: 0px 0px 20px white;
+        border-radius: 10px;
+    }
+
+    .right-column {
+        width: 75%
+    }
+
+    .left-column:hover,
+    .right-column:hover {
+        scale: 1.01;
+    }
+
+    .left-column {
+        width: 25%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .left-column form {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    input[type=file]::file-selector-button {
+        margin-right: 20px;
+        border: none;
+        background: #131313;
+        padding: 10px 20px;
+        border-radius: 10px;
+        color: #fff;
+    }
+
+    input[type=file]::file-selector-button:hover {
+        background: #f3f3f4;
+        color: black;
+    }
+
+    .librarian-details img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
+
+    .password-change form {
+        margin-top: 20px;
+    }
+
+    .password-change input {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .password-change button {
+        width: 100%;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .delete-account-btn {
+        background-color: #dc3545;
+    }
+
+    .section-distribution {
+        margin-top: 20px;
+    }
+
+    .librarian-sections ul,
+    .librarian-books ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .librarian-sections li,
+    .librarian-books li {
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}

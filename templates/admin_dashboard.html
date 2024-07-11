@@ -1,0 +1,197 @@
+{%extends 'admin_layout.html' %}
+
+{% block title %}
+Admin Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="navbar" id="navbar">
+    <div id="incontainer">
+        <div id="heading">
+            <h4>ELIBRARY</h4>
+        </div>
+        <div id="dashhead">
+            <h3><i>ADMIN DASHBOARD</i></h3>
+        </div>
+        <div id="nav"><a href="/admin_profile" class="btn btn-outline-light">PROFILE</a>
+            <a href="/prime_access" class="btn btn-outline-light">PRIME ACCESS</a>
+            <a href="/admin_dashboard" class="btn btn-light"><b>HOME</b></a>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="left-column">
+        <h1>Statistics</h1>
+        <hr>
+        <div class="sub-column">
+            <h3>Total Users</h3>
+            <p>{{ total_users }}</p>
+
+        </div>
+        <hr>
+        <div class="sub-column">
+            <h3>Total Books</h3>
+            <p>{{ total_books }}</p>
+
+            <div class="table-container1">
+                <table class="book-table">
+                    <thead>
+                        <tr>
+                            <th>Book ID</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Section</th>
+                            <th>Added By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in books %}
+                        <tr>
+                            <td>{{ book.id }}</td>
+                            <td>{{ book.book_title }}</td>
+                            <td>{{ book.author }}</td>
+                            <td>{{ book.section_id }}</td>
+                            <td>{{ book.added_by }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <hr>
+        <div class="sub-column">
+            <h3>Total Sections</h3>
+            <p>{{ total_sections }}</p>
+            <div class="table-container1">
+                <table class="book-table">
+                    <thead>
+                        <tr>
+                            <th>Section ID</th>
+                            <th>Title</th>
+                            <th>Added By</th>
+                            <th>Prime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for section in sections %}
+                        <tr>
+                            <td>{{ section.section_id }}</td>
+                            <td>{{ section.section }}</td>
+                            <td>{{ section.added_by }}</td>
+                            <td>{%if section.prime == '0' %}No{%endif%}{%if section.prime == '1' %}Yes{%endif%}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <hr>
+    </div>
+    <div class="right-column">
+        <h1>Librarians</h1>
+        <hr>
+        <div class="table-container2">
+            <table class="table_lib">
+                <thead>
+                    <tr>
+                        <th>Librarian ID</th>
+                        <th colspan="2">Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for librarian in librarians %}
+                    <tr>
+                        <td>{{ librarian.lib_id }}</td>
+                        <td>{{ librarian.name }} </td>
+                        <td>
+                            <form action="/delete_account" method="POST">
+                                <input type="hidden" name="lib_id" value="{{librarian.lib_id}}">
+                                <input type="hidden" name="role" value="lib">
+                                <button type="submit" class="btn btn-danger"
+                                    onsubmit="return confirm('Are you sure you want to delete account ?');">Delete
+                                    Account</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <h2>Create New Librarian</h2>
+        <form action="/create_librarian" method="post">
+            <label for="lib_id">Librarian ID:</label>
+            <input type="text" id="lib_id" name="lib_id" class="btn btn-dark" required>
+            <label for="lib_name">Name:</label>
+            <input type="text" id="lib_name" name="lib_name" class="btn btn-dark" required>
+            <label for="lib_password">Password:</label>
+            <input type="password" id="lib_password" name="lib_password" class="btn btn-dark" required>
+            <button type="submit" style="margin-top: 10px ;" class="btn btn-outline-info">Create</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .container {
+        display: flex;
+        max-width: none;
+    }
+
+    .table-container1 {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .table-container2 {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .left-column {
+        flex: 7;
+        padding: 20px;
+    }
+
+    .right-column {
+        flex: 3;
+        padding: 20px;
+    }
+
+    .sub-column {
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid black;
+    }
+
+    th,
+    td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    form>input,
+    label,
+    button {
+        width: 100%;
+    }
+</style>
+{% endblock %}

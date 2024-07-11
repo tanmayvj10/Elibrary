@@ -1,0 +1,297 @@
+{% extends 'lib_layout.html' %}
+{% block content%}
+
+<div class="navbar" id="navbar">
+  <div id="incontainer">
+    <div id="heading">
+      <h4>ELIBRARY</h4>
+    </div>
+    <div id="dashhead">
+      <h3><i>LIBRARIAN DASHBOARD</i></h3>
+    </div>
+    <div id="nav"><a href="/lib_profile" class="btn btn-outline-light">PROFILE</a>
+      <a href="/book_access" class="btn btn-outline-light">BOOK ACCESS</a>
+      <a href="/librarian_dashboard" class="btn btn-light "><b>HOME</b></a>
+    </div>
+  </div>
+</div>
+
+
+<div class="search">
+  <div class="add">
+    <a class="element" href="/add_book">Add Book</a>
+    <a class="element" href="/add_section">Add Section</a>
+    <a class="element" href="/add_section">Manage Section</a>
+  </div>
+  {%if search_input %}
+  <a href="librarian_dashboard">Remove Filter</a>
+  {%endif%}
+  <form action="{{ url_for('filter_and_search_lib') }}" method="POST">
+    <div class="filter-search-container">
+      <div class="filter-container">
+        <label for="filter-by">Filter By:</label>
+        <select id="filter-by" name="filter_option">
+          <option value="section" {% if filter_type=='section' %} selected {% endif %}>Section</option>
+          <option value="book" {% if filter_type=='book' %} selected {% endif %}>Book</option>
+          <option value="author" {% if filter_type=='author' %} selected {% endif %}>Author</option>
+        </select>
+      </div>
+
+      <div class="search-container">
+        <input type="text" id="search-input" name="search_query" {% if search_input %}placeholder="{{search_input}}"
+          {%else%}placeholder="Search..." {%endif%} required>
+        <button id="search-button" type="submit">🔎</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% set total_sections = 0 %}
+{% set total_books = 0 %}
+
+{% for section in sections %}
+{% set total_sections = total_sections + 1 %}
+<div class="section-container">
+  <h2 class="btn btn-dark">{{ section.section }}</h2>
+  <div class="dropdown-content">
+    <div class="section_date"><b>{{section.date_added}}</b></div>
+    <p> <b>Description:</b> {{ section.description }}</p>
+    <div class="edit_section"><a href="/edit_section/{{ section.section_id }}">Edit Section</a>
+      <form action="/add_book?section_id={{ section.section_id }}" method="POST">
+
+        <button type="submit" class="btn btn-primary">Add Book</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+{% if section.books %}
+<div class="books">
+  {% for book in section.books %}
+  <div class="book">
+    <img src="{{ url_for('static', filename=book.book_cover) }}" alt="{{ book.book_title }} Cover">
+    <div class="book_details">
+      <h3>{{ book.book_title }}</h3>
+      <hr>
+      <p><strong>Author:</strong> {{ book.author }}</p>
+      <p><strong>Rating:</strong> {{ book.rating }}</p>
+      <p class="book_description"><strong>Description:</strong> {{ book.description }}</p>
+      <div class="button_group">
+        <a href="/edit_book/{{ book.id }}">Edit Details</a>
+        <a href="/delete_book/{{ book.id }}"
+          onclick="return confirm('Are you sure you want to delete this book');">Delete</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endfor %}
+
+{% if total_sections == 0 %}
+{% if sections|length == 0 %}
+{%if filter_type=="book"%}
+<p>No Book</p>
+{%else%}
+<p>No Sections</p>
+{%endif%}
+{% endif %}
+{% endif %}
+
+
+{% endblock %}
+
+{%block style%}
+<style>
+  .edit_section {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+
+  .button_group {
+    display: inline-flex;
+    position: absolute;
+    top: 75px;
+    right: 5px;
+  }
+
+  .button_group a {
+    height: auto;
+    width: auto;
+    margin: 5px;
+  }
+
+  .section-container h2 {
+    width: 100%;
+  }
+
+  .books {
+    display: inline-block;
+    width: 100%;
+
+  }
+
+  .book {
+    border: 2px solid wheat;
+    position: relative;
+    padding: 10px;
+    margin: 1%;
+    display: inline-flex;
+    height: 300px;
+    width: 47%;
+    background-color: #1B1F22;
+
+  }
+
+  .book:hover {
+    scale: 1.02;
+    background: #191919;
+    box-shadow: 0px 0px 50px #a1a1a1;
+    rgba(60, 60, 60, 0.7)
+  }
+
+  .book_img {
+    max-height: 265px;
+    max-width: 200px;
+  }
+
+
+  .book_details {
+    margin-left: 2%;
+    width: 100%;
+  }
+
+  .book_details h3 {
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .book_details hr {
+    margin-bottom: 10px;
+  }
+
+  .book_id {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+  }
+
+  .book_description {
+    max-height: 100px;
+
+    overflow-y: auto;
+
+    text-align: justify;
+  }
+
+  .add {
+    display: flex;
+    margin-right: 10px;
+  }
+
+  .element {
+    margin-right: 10px;
+  }
+
+
+  .search {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+  }
+
+  .remove_filter {
+    width: 200px;
+  }
+
+  .filter-search-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .filter-container,
+  .search-container {
+    margin-left: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+
+  .filter-container select {
+    background-color: black;
+    color: white;
+  }
+
+  .search-container input[type="text"] {
+    background-color: #000000;
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid grey;
+  }
+
+  .search-container button {
+    background: none;
+    margin-right: 20px;
+    margin-left: 5px;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    box-shadow: 2px 2px 5px rgb(102, 102, 102);
+  }
+
+  .section-container:hover .dropdown-content {
+    display: block;
+  }
+
+  hr {
+    margin: 0px
+  }
+
+
+  .main_content h2 {
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+
+  }
+
+
+  .section_date {
+    float: "right";
+    text-align: right;
+  }
+
+  .dropdown-content {
+    display: none;
+    padding: 10px;
+    background-color: #2B3035;
+    opacity: 0.8;
+    border-radius: 5px;
+    width: 95%;
+    margin-inline: 2.5%;
+  }
+
+  .main_content hr {
+    margin-top: 10px;
+  }
+
+  .dropdown-content p {
+    width: 80%;
+    text-align: justify;
+    margin-left: 10%;
+  }
+</style>
+{% endblock %}

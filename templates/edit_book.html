@@ -1,0 +1,255 @@
+{% extends 'lib_layout.html' %}
+
+{% block title %}
+{{book.book_title}}
+{% endblock %}
+
+<!-- MAIN BODY -->
+
+{% block content %}
+<div class="navbar" id="navbar">
+    <div id="incontainer">
+        <div id="heading">
+            <h4>ELIBRARY</h4>
+        </div>
+        <div id="dashhead">
+            <h3><i>LIBRARIAN DASHBOARD</i></h3>
+        </div>
+        <div id="nav"><a href="/lib_profile" class="btn btn-outline-light">PROFILE</a>
+            <a href="/book_access" class="btn btn-outline-light">BOOK ACCESS</a>
+            <a href="/librarian_dashboard" class="btn btn-outline-light "><b>HOME</b></a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="left-column" style="width: 20%;">
+        <img src="{{ url_for('static', filename=book.book_cover) }}" alt="{{ book.book_title }} Cover">
+
+
+        <form action="/upload_photo_book" method="post" enctype="multipart/form-data" class="photo_update">
+            <label for="photo">Update Photo:</label>
+            <input type="hidden" name="book_id" value="{{book.id}}">
+            <input type="file" id="photo" name="photo">
+            <button type="submit" class="btn btn-outline-light">Upload</button>
+        </form>
+        <form action="/update_book" method="POST">
+            <label for="title">Title</label>
+
+            <input type="text" id="title" name="title" value="{{ book.book_title }}" class="btn btn-dark">
+            <label for="author">Author</label>
+            <input type="text" id="author" name="author" value="{{ book.author }}" class="btn btn-dark">
+            <label for="description">Description</label>
+            <input type="text" id="description" name="description" value="{{ book.description }}" class="btn btn-dark">
+            <label for="link">Link</label>
+            <input type="text" id="link" name="link" value="{{ book.link }}" class="btn btn-dark">
+
+            <label for="section_id">Section</label>
+            <select id="section_id" name="section_id" class="btn btn-dark   ">
+                {% for sec in sections %}
+                <option value="{{ sec.section_id }}" {% if sec.section_id==section.section_id %} selected {% endif %}>
+                    {{ sec.section }}
+                </option>
+                {% endfor %}
+            </select>
+            <input type="hidden" name="book_id" value="{{ book.id }}">
+
+
+            <a href="{{book.link}}" target=”_blank” style="margin-top:10px;">See Book</a>
+            <button type="submit" class="btn btn-outline-light">UPDATE</button>
+        </form>
+    </div>
+
+    <div class="center-column" style="width: 50%;">
+        <h2>Book Reviews</h2>
+        <div class="table-container">
+            <table class="table table-dark table-hover">
+                <thead class="table table-light">
+                    <tr>
+                        <th>User</th>
+                        <th>Review</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in book.reviews if review.reviews %}
+                    <tr>
+                        <td>{{ review.user_id if review.user_id else 'Unknown User' }}</td>
+                        <td>{{ review.reviews }}</td>
+                        <td>
+                            <form action="/delete_review/{{ user_id }}" method="post">
+
+                                <input type="hidden" name="user_id" value="{{ user_id }}">
+
+                                <button type="submit" class="btn btn-danger" class="delete_review">delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+
+    <!-- Right column -->
+    <div class="right-column" style="width: 30%;">
+        <h2>Ratings</h2>
+        <p>Average Rating: {{ book.rating }}</p>
+        {%if rating_percentage_list%}
+        <div id="barchart_material" style="width: 350px; height: 300px;"></div>
+        {%endif%}
+
+
+    </div>
+    <div class="return-button">
+        <a href="/librarian_dashboard" class="return-link">Return to Dashboard</a>
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+<!-- CSS STARTS HERE -->
+{% block style %}
+<style>
+    .left-column form button {
+        margin-top: 10px;
+    }
+
+    .container {
+        display: flex;
+        max-width: none;
+    }
+
+    .left-column,
+    .center-column,
+    .right-column {
+        padding: 20px;
+        box-shadow: 0px 0px 10px white;
+        border-radius: 10px;
+        margin: 20px
+    }
+
+    .left-column:hover,
+    .center-column:hover,
+    .right-column:hover {
+        scale: 1.01;
+    }
+
+    .left-column form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .left-column form>input,
+    label,
+    select {
+        width: 100%;
+    }
+
+    .left-column {
+        width: 20%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .center-column {
+        width: 50%;
+    }
+
+    .right-column {
+        width: 30%;
+    }
+
+    img {
+        max-width: 300px;
+        width: 200px;
+        height: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-container {
+        max-height: 1000px;
+        overflow-y: auto;
+    }
+
+
+    form {
+        margin-top: 20px;
+    }
+
+    .bar-graph {
+        margin-top: 20px;
+    }
+
+    .bar {
+        background-color: #545c62;
+        width: 100%;
+        text-align: center;
+        color: white;
+        font-size: 14px;
+        line-height: 24px;
+        margin-bottom: 5px;
+    }
+
+    .return-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .return-link {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .return-link:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+{% endblock %}
+
+
+{%block script%}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['bar'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    var rating_percentage_list = [
+        ['Rating', 'Percentage'],
+        {% for item in rating_percentage_list[0:] %}
+    { { item | tojson } },
+    {% endfor %}];
+
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable(rating_percentage_list);
+
+        var options = {
+            bars: 'horizontal', backgroundColor: { fill: "transparent" }, legend: { position: 'none' }, 'chartArea': { left: 10, top: 20, 'width': '90%', 'height': '80%', 'backgroundColor': { 'fill': 'transparent' } }, hAxis: {
+                gridlines: {
+                    color: 'transparent'  // Make the vertical gridlines transparent
+                }
+            }, titleTextStyle: { color: '#FFF' }, vAxis: { textStyle: { color: '#FFF' } }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('barchart_material'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+    }
+</script>
+{%endblock%}

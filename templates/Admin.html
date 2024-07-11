@@ -1,0 +1,149 @@
+{% extends 'layout.html' %}
+{% block title %}
+User Login
+{% endblock %}
+{% block content %}
+<div class="contain">
+    <h2><img src="static/logo2.png" alt=""><b><i>E-LIBRARY </i></b> LOGIN</h2>
+    <div class="opt">
+        <a href="/">USER </a>|<a href="lib"> LIBRARIAN </a>|<a href=""><b> ADMIN </b></a>|<a
+            href="{{url_for('register')}}"> REGISTER</a>
+    </div>
+
+    <form method="post">
+        <label for="admin_id">Admin ID:
+            <input type="text" name="admin_id" id="admin_id" class="form-control" placeholder="admin_id" required />
+        </label>
+        <br>
+        <label for="password">Password:
+            <input type="password" name="password" id="password" class="form-control" placeholder="Password" required />
+        </label>
+        <br>
+        <button type="submit" class="btn btn-success" value="login">Submit</button>
+
+    </form>
+</div>
+
+{% endblock %}
+{% block style %}
+<style>
+    img {
+        display: inline-block;
+        height: 50px;
+        width: 50px;
+        margin-left: 10px;
+        margin-right: 20px;
+    }
+
+    /*MAIN DIV*/
+    .contain {
+        border-radius: 15px;
+        width: 25%;
+        margin: auto;
+        margin-top: 150px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 60vh;
+        background: linear-gradient(90deg, rgb(162, 31, 31) 35%, rgb(225, 86, 86) 100%);
+        box-shadow: 0px 0px 150px rgba(255, 4, 4, 0.581);
+        margin-left: 38em;
+    }
+
+    .contain:hover {
+        box-shadow: 0px 0px 150px rgba(255, 4, 4, 0.629);
+    }
+
+    /*HEADING*/
+    h2 {
+        width: 100%;
+        padding: 10px;
+        padding-bottom: 5px;
+        /* border:1px solid black; */
+        border-radius: 15px 15px 0px 0px;
+        border-bottom: 1px solid black;
+        background-color: pink;
+        /* font-weight: bold; */
+        margin: 0px;
+        color: aliceblue;
+        background: rgb(2, 0, 36);
+        background: linear-gradient(90deg, rgb(162, 31, 31) 35%, rgb(225, 86, 86) 100%);
+    }
+    ul {
+        padding-top: 15px;
+    }
+
+    li {
+        font-weight: bold;
+        color: red;
+    }
+
+    #err {
+        text-align: center;
+        width: 100%;
+        padding: 10px;
+        color: aliceblue;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 35px;
+        margin-bottom: 10px;
+        text-align: center;
+        /*opacity:0.5;*/
+    }
+
+    .opt {
+        text-align: center;
+        width: 100%;
+        padding: 10px;
+        border-bottom: 1px solid white;
+        border-top: 1px solid white;
+        background-color: #481313;
+        color: aliceblue;
+    }
+
+    form {
+        margin-top: 35px;
+        width: 70%;
+    }
+
+    form label {
+        color: aliceblue;
+        width: 100%;
+        display: inline-block;
+
+    }
+
+    form input {
+        margin-top: 5px;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    button {
+        margin: 10% 0% 7%;
+        width: 100%;
+    }
+
+
+
+    a {
+        padding: 5px;
+        text-decoration: none;
+        color: rgb(175, 181, 185);
+    }
+
+    a:hover {
+        color: aliceblue;
+    }
+
+    #reg {
+        text-decoration: underline;
+    }
+
+    b {
+        color: white;
+    }
+</style>
+{% endblock %}

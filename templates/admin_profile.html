@@ -1,0 +1,98 @@
+{% extends 'admin_layout.html' %}
+
+
+{% block title %}
+Admin Profile
+{% endblock %}
+
+{% block content %}
+
+<div class="navbar" id="navbar">
+    <div id="incontainer">
+        <div id="heading">
+            <h4>ELIBRARY</h4>
+        </div>
+        <div id="dashhead">
+            <h3><i>ADMIN DASHBOARD</i></h3>
+        </div>
+        <div id="nav"><a href="/admin_profile" class="btn btn-light"><b>PROFILE</b></a>
+            <a href="/prime_access" class="btn btn-outline-light">PRIME ACCESS</a>
+            <a href="/admin_dashboard" class="btn btn-outline-light">HOME</a>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="left-column">
+        <h2>Admin Profile</h2>
+        <div>
+            <p>Admin ID: {{ admin.admin_id }}</p>
+            <img src="{{ url_for('static', filename=admin.admin_img) }}" alt="Admin Photo" width="150">
+            <form action="/upload_photo_admin" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="admin_id" value="{{admin.admin_id}}">
+                <label for="photo">Upload Profile Photo:</label>
+                <input type="file" id="photo" name="photo">
+                <button type="submit" class="btn btn-outline-info">Upload</button>
+            </form>
+        </div>
+    </div>
+    <div class="right-column">
+        <h2>Edit Profile</h2>
+        <form action="/admin_profile" method="post">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{ admin.name }}" class="btn btn-dark" required>
+            <label for="current_password">Current Password:</label>
+            <input type="password" id="current_password" name="current_password" class="btn btn-dark" required>
+            <label for="new_password">New Password:</label>
+            <input type="password" class="btn btn-dark" id="new_password" name="new_password">
+            <button type="submit" class="btn btn-outline-light">Submit</button>
+        </form>
+        <form action="/logout" method="post" onsubmit="return confirm('Are you sure you want to logout ?');">
+            <button type="submit" class="btn btn-danger">Logout</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .left-column {
+        flex: 2;
+        padding: 20px;
+    }
+
+    .right-column {
+        flex: 3;
+        padding: 20px;
+    }
+
+    form {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="file"],
+    button {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+
+    img {
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,353 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+User Dashboard
+{% endblock %}
+
+<!-- MAIN BODY -->
+{% block content %}
+<div class="navbar" id="navbar">
+  <div id="incontainer">
+    <div id="heading">
+      <h4>ELIBRARY</h4>
+    </div>
+    <div id="dashhead">
+      <h3><i>USER DASHBOARD</i></h3>
+    </div>
+    <div id="nav"><a href="user_profile" class="btn btn-outline-danger">PROFILE</a>
+      <a href="" class="btn btn-danger"><b>MY BOOKS</b></a>
+      <a href="booksdash" class="btn btn-outline-danger">HOME</a>
+    </div>
+  </div>
+</div>
+
+
+<div class="main_content">
+  <h2 class="btn btn-dark">REQUESTED</h2>
+
+  <div class="books">
+    {%if requested_book_details %}
+    {% for book in requested_book_details %}
+    <div class="book">
+      <img src="{{ url_for('static', filename=book.book_cover) }}" alt="{{ book.book_title }} Cover" class="book_img">
+      <div class="book_details">
+        <h3>{{ book.book_title }}</h3>
+        <hr>
+        <p class="book_id">#{{book.id}}</p>
+        <p><strong>Author:</strong> {{ book.author }}</p>
+        <p><strong>Rating:</strong>
+          {% if book.rating is not none %}
+          {% for i in range(1, 6) %}
+          {% if book.rating >= i %}
+          <span class="star">&#9733;</span>
+          {% else %}
+          <span class="star">&#9734;</span>
+          {% endif %}
+          {% endfor %}
+          ({{book.rating}})
+          {% else %}
+          <em>No rating available</em>
+          {% endif %}
+        </p>
+        <p class="book_description"><strong>Description:</strong> {{ book.description }}</p>
+
+
+        <form action="/cancel_request" method="post">
+          <input type="hidden" name="user_id" value="{{ user.id }}">
+          <input type="hidden" name="book_id" value="{{ book.id }}">
+          <button type="submit"  class="cancel_request">Cancel Request</button>
+        </form>
+
+        <a href="/book/{{ book.id }}" class="btn btn-outline-danger" class="read_more">Read More</a>
+
+      </div>
+    </div>
+    {% endfor %}
+    {%else%}
+    no books requested
+    {%endif%}
+  </div>
+
+
+  {% for section in sections %}
+  {% if section.books %}
+  <div class="section-container">
+    <h2 class="btn btn-danger"><b>{{ section.section }}</b></h2>
+    <div class="dropdown-content">
+      <div class="section_date"><b>{{section.date_added}}</b></div>
+      <p><b>Description: </b>{{ section.description }}</p>
+    </div>
+  </div>
+  <div>
+    <div class="books">
+      {% for book in section.books %}
+      <div class="book">
+
+        <img src="{{ url_for('static', filename=book.book_cover) }}" alt="{{ book.book_title }} Cover" class="book_img">
+        <div class="book_details">
+          <h3>{{ book.book_title }}</h3>
+          <hr>
+          <p class="book_id">#{{book.id}}</p>
+          <p><strong>Author:</strong> {{ book.author }}</p>
+          <p class="book_rating"><strong>Rating:</strong>
+            {% if book.rating is not none %}
+            {% for i in range(1, 6) %}
+            {% if book.rating >= i %}
+            <span class="star">&#9733;</span>
+            {% else %}
+            <span class="star">&#9734;</span>
+            {% endif %}
+            {% endfor %}
+            ({{book.rating}})
+            {% else %}
+            <em>No rating available</em>
+            {% endif %}
+            <a href="/book/{{ book.id }}" class="review">📝</a>
+          </p>
+          <p class="book_description"><strong>Description:</strong> {{ book.description }}</p>
+          {%for booki in book_issued%}
+          {%if booki.book_id==book.id%}
+          <p><strong>Access Date:</strong> {{ booki.access_date }}</p>
+          {%endif%}
+          {%endfor%}
+          <a href="{{ book.link }}" target="_blank" class="pdf_link">Read</a>
+
+          <form action="/return_book" method="post"
+            onsubmit="return confirm('Are you sure you want to return this book?');">
+            <input type="hidden" name="book_id" value="{{ book.id }}">
+            <button class="return_Book" type="submit">Return</button>
+          </form>
+
+          <div class="other_elements">
+
+
+            {% if book.id in completed_book_ids %}
+            <form action="/remove_from_completed/{{ book.id }}" method="post">
+              <input type="hidden" name="book_id" value="{{ book.id }}">
+              <input type="hidden" name="user_id" value="{{ user.id }}">
+              <button type="submit"><span style='font-size:150%;color: green;'>&#10003;</span></button>
+            </form>
+            {% else %}
+            <form action="/add_book_as_completed/{{ book.id }}" method="post">
+              <input type="hidden" name="book_id" value="{{ book.id }}">
+              <input type="hidden" name="user_id" value="{{ user.id }}">
+              <button type="submit"><span style='font-size:150%;color: rgb(249, 252, 249);'>&#10003;</span></button>
+            </form>
+            {% endif %}
+
+            {% if book.id in favorite_books|map(attribute='book_id') %}
+            <form action="/remove_favorite" method="post">
+              <input type="hidden" name="book_id" value="{{ book.id }}">
+              <input type="hidden" name="user_id" value="{{ user.id }}">
+              <button type="submit"><span style="font-size:200%;color:rgb(255, 0, 0);">&hearts;</span></button>
+              {% else %}
+              <form action="/add_favourite/{{ book.id }}" method="post">
+                <input type="hidden" name="book_id" value="{{ book.id }}">
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <button type="submit"> <span style="font-size:200%;color:rgb(255, 255, 255);">&#x2661;</span></button>
+              </form>
+              {% endif %}
+
+
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% endif %}
+    {% endfor %}
+
+  </div>
+
+  {% endblock %}
+
+  <!-- CSS STARTS HERE -->
+  {% block style %}
+  <style>
+    .main_content h2 {
+      display: flex;
+      justify-content: center;
+    }
+
+    .books {
+      display: inline-block;
+      width: 100%;
+    }
+    .book {
+      border: 2px solid rgb(23, 23, 23);
+      position: relative;
+      padding: 10px;
+      margin: 1%;
+      display: inline-flex;
+      height: 300px;
+      width: 47%;
+      background-color:transparent;
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      border:1px dotted rgb(138, 138, 138);
+    }
+  
+    .book:hover {
+      scale: 1.01;
+      box-shadow: 0px 0px 10px #000000;
+    }
+
+    .book_img {
+      margin-top: 5px;
+      max-height: 265px;
+      max-width: 200px;
+      border-radius:20px;
+    }
+
+    .book_details {
+      margin-left: 2%;
+      width: 100%;
+    }
+
+    .book_details h3 {
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .book_details hr {
+      margin-bottom: 10px;
+    }
+
+    .book_id {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .book_description {
+      max-height: 100px;
+      height: 85px;
+      overflow-y: auto;
+      text-align: justify;
+    }
+
+    .review {
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 5px;
+      border-radius: 5px;
+      width: auto;
+    }
+
+    .book_rating {
+      display: flex;
+      align-items: center;
+    }
+
+    .pdf_link {
+      position: absolute;
+      top: 70px;
+      right: -15px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 5px;
+      border-radius: 5px;
+      width: 100px;
+      border: 1px solid rgb(59, 59, 59);
+    }
+
+    .return_Book {
+      position: absolute;
+      top: 110px;
+      right: 10px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 5px;
+      border-radius: 5px;
+      width: 100px;
+      border: 1px solid rgb(59, 59, 59);
+    }
+
+    .cancel_request {
+      position: absolute;
+      top: 80px;
+      right: 10px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 5px;
+      border-radius: 5px;
+      width: 100px;
+      border: 1px solid rgb(59, 59, 59);
+    }
+
+
+
+    .other_elements button {
+      background-color: transparent;
+      border: none;
+      height: 30px;
+      width: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .other_elements {
+      position: absolute;
+      top: 255px;
+      right: 15px;
+      display: flex;
+      justify-content: center;
+
+    }
+
+    a {
+      display: flex;
+      margin-inline: 25px;
+      padding: 10px;
+      padding-inline: 20px;
+      border-radius: 15px;
+      width: 90%;
+      justify-content: center;
+      text-decoration: none;
+      color: #000000;
+      background-color: #ffffff;
+      font-weight: bold;
+    }
+
+    a:hover {
+      background-color: #000000;
+      color: #ffffff;
+    }
+
+    .main_content {
+      height: 100%;
+      padding: 20px;
+    }
+
+    .dropdown-content {
+      display: none;
+      padding: 10px;
+      background-color: #2B3035;
+      opacity: 0.8;
+      border-radius: 5px;
+      width: 95%;
+      margin-inline: 2.5%;
+    }
+
+    .dropdown-content p {
+      width: 80%;
+      text-align: justify;
+      margin-left: 10%;
+    }
+
+    .section_date {
+      float: "right";
+      text-align: right;
+    }
+
+    .section-container:hover .dropdown-content {
+      display: block;
+    }
+  </style>
+
+  {% endblock %}

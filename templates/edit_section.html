@@ -1,0 +1,180 @@
+{%extends 'lib_layout.html'%}
+
+{%block content%}
+
+
+<div class="navbar" id="navbar">
+    <div id="incontainer">
+        <div id="heading">
+            <h4>ELIBRARY</h4>
+        </div>
+        <div id="dashhead">
+            <h3><i>LIBRARIAN DASHBOARD</i></h3>
+        </div>
+        <div id="nav"><a href="/lib_profile" class="btn btn-outline-light">PROFILE</a>
+            <a href="/book_access" class="btn btn-outline-light">BOOK ACCESS</a>
+            <a href="/librarian_dashboard" class="btn btn-outline-light "><b>HOME</b></a>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="section-edit">
+    <div class="left">
+        <h2>Edit Section Details</h2>
+        <form action="/update_section/{{ section.section_id }}" method="POST">
+            <label for="section_name">Section Name:</label>
+            <input type="text" id="section_name" name="section_name" value="{{ section.section }}" class="btn btn-dark">
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4"
+                class="btn btn-dark">{{ section.description }}</textarea>
+            <label>Type:</label>
+            <div class="radio">
+                <div class="radio">
+                    <input type="radio" id="prime" name="type" value="prime" {% if section.prime=="1" %}checked{% endif
+                        %}>
+                    <label for="prime">Prime</label>
+                </div>
+                <div class="radio">
+                    <input type="radio" id="general" name="type" value="general" {% if section.prime !="1" %}checked{%
+                        endif %}>
+                    <label for="general">General</label>
+                </div>
+            </div>
+            <button type="submit">Update Section</button>
+        </form>
+    </div>
+    <div class="right">
+        <h2>Books in Section</h2>
+        <table class="table table-dark table-hover">
+            <thead class="table table-light">
+                <tr>
+                    <th>Book ID</th>
+                    <th>Book Title</th>
+                    <th>Author</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td>{{ book.id }}</td>
+                    <td>{{ book.book_title }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>
+                        <form action="/delete_book/{{ book.id }}" method="post">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="return-button">
+    <a href="/librarian_dashboard" class="return-link">Return to Dashboard</a>
+</div>
+{%endblock%}
+{%block style%}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .section-edit {
+        display: flex;
+    }
+
+    .left {
+        flex: 1;
+        padding: 20px;
+        margin-left: 50px;
+        margin-right: 50px;
+    }
+
+    .radio {
+        display: flex;
+        margin-inline: 10px;
+    }
+
+    .radio input {
+        margin-inline-end: 10px;
+
+    }
+
+    .left h2 {
+        margin-top: 0;
+    }
+
+    .left form {
+        margin-top: 20px;
+    }
+
+    .left label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .left input[type="text"],
+    .left textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .left button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .left button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Right part styles */
+    .right {
+        flex: 1;
+        padding: 20px;
+    }
+
+    .right h2 {
+        margin-top: 0;
+    }
+
+    .right ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .right li {
+        margin-bottom: 10px;
+    }
+
+    .return-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .return-link {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .return-link:hover {
+        background-color: #0056b3;
+    }
+</style>
+{%endblock%}

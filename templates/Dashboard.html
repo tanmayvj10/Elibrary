@@ -1,0 +1,489 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+User Dashboard
+{% endblock %}
+
+{% block content %}
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div id="incontainer">
+    <div id="heading">
+      <h4>ELIBRARY</h4>
+    </div>
+    <div id="dashhead">
+      <h3><i>USER DASHBOARD</i></h3>
+    </div>
+    <div id="nav"><a href="user_profile" class="btn btn-outline-danger">PROFILE</a>
+      <a href="mybooks" class="btn btn-outline-danger">MY BOOKS</a>
+      <a href="" class="btn btn-danger"><b>HOME</b></a>
+    </div>
+  </div>
+</div>
+
+
+<!-- LATEST DIVISION  ( ONLY APPLIED WHEN NO SPECIFIC SEARCH IS THEIR)-->
+{% if not search_input %}
+
+{%set count=0 %}
+<div class="latest">
+  <div class="latest-Heading">
+    <h2>LATEST</h2>
+  </div>
+  <div class="latest_books">
+    {% for section in sections %}
+    {% for book in section.books %}
+    {% if book.date_added > latest %}
+    {% set count=count+1 %}
+
+    <div class="latest_container">
+      <img src="{{ url_for('static', filename=book.book_cover) }}" alt="{{ book.book_title }} Cover">
+
+      <div class="latest_overlay">
+        <h6>{{ book.book_title }}</h6>
+        <div class="latest_text"><a href="/book/{{ book.id }}" class="btn btn-outline-danger">Read More</a></div>
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endfor %}
+
+    <div class="More_books">
+      <h1>More new books coming soon...</h1>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- SEARCH TAB -->
+<div class="search">
+  {%if search_input %}
+  <a href="booksdash" class="remove_filter">Remove Filter</a>
+  {%endif%}
+
+  <form action="{{ url_for('filter_and_search') }}" method="POST">
+
+    <div class="filter-search-container">
+      <div class="filter-container">
+        <label for="filter-by">Filter By: &nbsp</label>
+        <select  class="btn btn-outline-dark dropdown-toggle"  name="filter_option">
+          <option value="section" {% if filter_type=='section' %} selected {% endif %}>Section</option>
+          <option value="book" {% if filter_type=='book' %} selected {% endif %}>Book</option>
+          <option value="author" {% if filter_type=='author' %} selected {% endif %}>Author</option>
+        </select>
+      </div>
+
+      <div class="search-container">
+        <input type="text" id="search-input" name="search_query" class="btn btn-outline-dark" {% if search_input %}placeholder="{{search_input}}"
+          {%else%}placeholder="Search..." {%endif%} required>
+        <button id="search-button" type="submit">🔍</button>
+      </div>
+    </div>
+  </form>
+</div>
+<hr class="section_hr">
+<!-- MAIN CONTENT -->
+<div class="main_content">
+  {% set total_books = 0 %}
+  {% set total_sections = 0 %}
+  {% for section in sections %}
+  {% set total_sections = total_sections + 1 %}
+  <div class="section-container">
+    <h2 class="btn btn-danger">{{ section.section }}</h2>
+    <div class="dropdown-content">
+      <div class="section_date"><b>{{section.date_added}}</b></div>
+      <p> <b>Description:</b> {{ section.description }}</p>
+    </div>
+  </div>
+
+  <div>
+    {% if section.books %}
+    <div class="books">
+      {% for book in section.books %}
+      <div class="book">
+        <img src="{{ url_for('static', filename=book.book_cover) }}" alt="{{ book.book_title }} Cover" class="book_img">
+        <div class="book_details">
+          <h3>{{ book.book_title }}</h3>
+          <hr>
+          <p class="book_id">#{{book.id}}</p>
+          <p><strong>Author:</strong> {{ book.author }}</p>
+          <p><strong>Rating:</strong>
+            {% if book.rating is not none %}
+            {% for i in range(1, 6) %}
+            {% if book.rating >= i %}
+            <span class="star">&#9733;</span>
+            {% else %}
+            <span class="star">&#9734;</span>
+            {% endif %}
+            {% endfor %}
+            ({{book.rating}})
+            {% else %}
+            <em>No rating available</em>
+            {% endif %}
+          </p>
+
+          <p class="book_description"><strong>Description:</strong> {{ book.description }}</p>
+          <a href="/book/{{ book.id }}" class="btn btn-danger">Read More</a>
+          {% for request in req %}
+          {% if request.book_id == book.id %}
+          <div class="requested-overlay">Requested</div>
+          {% endif %}
+          {% endfor %}
+
+
+        </div>
+        {% set total_books = total_books + 1 %}
+      </div>
+      {% endfor %}
+
+    </div>
+    {%else%}
+    <p>no book now :(</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  {% if total_sections == 0 %}
+  {% if sections|length == 0 %}
+  {%if filter_type=="book"%}
+  <p>No Book</p>
+  {%else%}
+  <p>No Sections</p>
+  {%endif%}
+  {% endif %}
+  {% endif %}
+</div>
+{% endblock %}
+
+<!-- CSS STARTS HERE -->
+{% block style %}
+<style>
+  .latest {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    background: #1B1F22;
+    background: radial-gradient(circle, rgb(251, 97, 97, 0.816) 0%, rgba(250, 28, 28, 0.816) 30%, rgba(255, 191, 0, 0) 90%);
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
+    height: 350px;
+    border-radius: 0%;
+    align-items: center;
+    border-radius: 40px;
+  }
+
+
+  .latest-Heading {
+    background: linear-gradient(90deg,rgba(250, 28, 28, 0.816) 85%, rgb(10, 10, 10) 100%);
+    margin-right: 20px;
+    width: 70px;
+    box-shadow: 0px 0px 20px rgb(168, 164, 164);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .latest-Heading h2 {
+
+    rotate: -90deg;
+    position: relative;
+    z-index: 0;
+  }
+
+  .latest_books {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    height: 90%;
+    margin-left: 0px;
+  }
+
+  .latest_container {
+    position: relative;
+    display: flex;
+    margin-inline: 5px;
+    box-shadow: 0px 0px 10px rgb(55, 55, 55);
+    border:10px solid rgb(184, 77, 77);
+  }
+
+  .latest_container:hover {
+    scale: 0.9;
+  }
+
+  .latest_image {
+    display: block;
+
+  }
+
+  .latest_overlay {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    background-color: #212628;
+    overflow: hidden;
+    height: 0;
+    opacity: 0.9;
+    transition: .5s ease;
+    display: flex;
+    justify-content: center;
+
+  }
+
+  .latest_overlay h6 {
+    text-wrap: wrap;
+    word-wrap: break-word;
+    padding: 10px;
+    text-align: center;
+    margin-top: 40%;
+  }
+
+  .latest_container:hover .latest_overlay {
+    bottom: 0;
+    height: 100%;
+    padding: 10px;
+  }
+
+  .latest_text {
+    white-space: nowrap;
+    color: white;
+    font-size: 20px;
+    position: absolute;
+    overflow: hidden;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    margin-top: 3em;
+    width: 120px;
+  }
+
+  .More_books {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    opacity: 0.5;
+  }
+
+  .search {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+  }
+
+  .remove_filter {
+    width: 200px;
+  }
+
+  .filter-search-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    /* Align items to the right */
+  }
+
+  .filter-container,
+  .search-container {
+    margin-left: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Adjust as needed */
+  }
+
+
+  .filter-container select {
+    background-color: black;
+    color: rgb(101, 101, 101);
+  }
+
+  .search-container input[type="text"] {
+    background-color: #000000;
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid rgb(51, 51, 51);
+  }
+
+  .search-container button {
+    background: none;
+    margin-right: 20px;
+    margin-left: 5px;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+  }
+
+  .main_content {
+    height: 100%;
+    padding: 20px;
+  }
+
+    
+  .section-container:hover .dropdown-content {
+    display: block;
+  }
+
+  hr {
+    margin: 0px
+  }
+
+  .main_content h2 {
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+
+  }
+
+
+  .section_date {
+    float: "right";
+    text-align: right;
+  }
+
+  .dropdown-content {
+    display: none;
+    padding: 10px;
+    opacity: 0.8;
+    border-radius: 5px;
+    width: 95%;
+    margin-inline: 2.5%;
+    backdrop-filter: blur(10px);
+  }
+
+  .main_content hr {
+    margin-top: 10px;
+  }
+
+  .dropdown-content p {
+    width: 80%;
+    text-align: justify;
+    margin-left: 10%;
+  }
+
+
+  .books {
+    display: inline-block;
+    width: 100%;
+
+  }
+
+  .book {
+    border: 2px solid rgb(23, 23, 23);
+    position: relative;
+    padding: 10px;
+    margin: 1%;
+    display: inline-flex;
+    height: 300px;
+    width: 47%;
+    background-color:transparent;
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+    border:1px dotted rgb(138, 138, 138);
+  }
+
+  .book:hover {
+    scale: 1.01;
+    box-shadow: 0px 0px 10px #000000;
+    backdrop-filter: blur(10px);
+  }
+
+  .book_img {
+    margin-top: 5px;
+    max-height: 265px;
+    max-width: 200px;
+    border-radius:20px;
+  }
+
+
+  .book_details {
+    margin-left: 2%;
+    width: 100%;
+  }
+
+  .book_details h3 {
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .book_details hr {
+    margin-bottom: 10px;
+  }
+
+  .book_id {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+  }
+
+  .book_description {
+    max-height: 100px;
+    overflow-y: auto;
+    text-align: justify;
+  }
+
+  .requested-overlay {
+    position: absolute;
+    top: 90px;
+    right: 115px;
+    background-color: rgb(121, 163, 25);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+  }
+
+  .book_details a {
+    position: absolute;
+    top: 90px;
+    right: -15px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    width: 100px;
+    border: 1px solid rgb(59, 59, 59);
+  }
+
+  a {
+    display: flex;
+    margin-inline: 25px;
+    padding: 10px;
+    padding-inline: 20px;
+    border-radius: 15px;
+    width: 100%;
+    justify-content: center;
+    text-decoration: none;
+    color: #000000;
+    background-color: #ffffff;
+    font-weight: bold;
+  }
+
+  a:hover {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+
+  /*body {
+    background-image: url('static/Lib_AB (1).png');
+    background-repeat: no-repeat;
+    background-size: cover;
+  }*/
+</style>
+
+{% endblock %}

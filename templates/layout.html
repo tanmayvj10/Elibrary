@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    {% block title %}
+    {% endblock %}
+  </title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  {% block style %}
+  {% endblock %}
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+  <!-- Overlay Div -->
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <div id="overlay">
+    <div class="overlay-content">
+
+      <ul>
+        {% for message in messages %}
+        <li>{{ message }} <a class="close_overlay" href="" onclick="goBack()">x</a></li>
+        {% endfor %}
+
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  {% block content %}
+  {% endblock %}
+
+  <style>
+    body {
+      background-color: #000000;
+      background: url('static/bgg.png');
+      background-repeat: no-repeat;
+      background-size: cover;
+      color: rgb(255, 255, 255);
+    }
+
+    ul {
+      color: white;
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 7px;
+      background-color: rgb(24, 28, 28);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #535353;
+      border-radius: 2px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: #c9c9c9;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+    }
+
+    .overlay-content {
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .close-btn:hover {
+      color: red;
+    }
+
+    .navbar {
+      width: 100%;
+      position: sticky;
+      top: 0;
+      display: flex;
+      width: calc(100% - 20px);
+      margin: 10px;
+      border: none;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding-top: 0px;
+
+    }
+
+    #incontainer {
+      justify-content: left;
+      height: 8vh;
+      width: 100%;
+      display: flex;
+      backdrop-filter: blur(20px);
+
+    }
+
+    #heading {
+      display: flex;
+      width: 20%;
+      border: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #dashhead {
+      width: 40%;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+
+    #nav {
+      display: flex;
+      width: 40%;
+      border: none;
+      display: flex;
+      float: right;
+      flex-direction: row-reverse;
+      align-items: center;
+      padding-right: 5%;
+
+    }
+  </style>
+
+  {% block script %}
+  <script>
+    function showOverlay() {
+      document.getElementById('overlay').style.display = 'flex';
+    }
+
+    function hideOverlay() {
+      document.getElementById('overlay').style.display = 'none';
+    }
+
+    function goBack() {
+      window.history.back();
+    }
+
+    window.onload = function () {
+      var messages = "{{ messages|length }}";
+      if (messages > 0) {
+        showOverlay();
+      }
+    }
+  </script>
+  {% endblock %}
+</body>
+
+</html>

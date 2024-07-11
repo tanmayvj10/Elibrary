@@ -1,0 +1,288 @@
+{% extends 'layout.html' %}
+{% block title %}
+{{book.book_title}}
+{% endblock %}
+
+<!-- MAIN BODY -->
+
+{% block content %}
+<div class="navbar" id="navbar">
+    <div id="incontainer">
+        <div id="heading">
+            <h4>ELIBRARY</h4>
+        </div>
+        <div id="dashhead">
+            <h3><i>USER DASHBOARD</i></h3>
+        </div>
+        <div id="nav"><a href="/user_profile" class="btn btn-outline-light">PROFILE</a>
+            <a href="/mybooks" class="btn btn-outline-light">MY BOOKS</a>
+            <a href="/dashboard" class="btn btn-outline-light">HOME</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="left-column" style="width: 20%;">
+        <img src="{{ url_for('static', filename=book.book_cover) }}" alt="{{ book.book_title }} Cover">
+        <p>{{section.section}}</p>
+        <h2>{{ book.book_title }}</h2>
+        <p><strong>Author:</strong> {{ book.author }}</p>
+        <p><strong>Description:</strong> {{ book.description }}</p>
+        <div class="issue-form">
+            {% if count<=5 %} {% if user and not is_requested and not is_issued %} <form
+                action="/issue_book/{{ book.id }}" method="post">
+                <label for="days">Select number of days:</label>
+                <input class="form-control" type="number" id="days" name="days" min="1" max="30" required>
+                <button class="btn btn-outline-light" type="submit">Issue</button>
+                </form>
+                {%endif%}
+                {% if is_requested %}
+                <p>This book is already requested by you.</p>
+                {% endif %}
+                {% if is_issued %}
+                <p>This book is already issued by you.</p>
+                {% endif %}
+
+                {%else %}
+                <p>return other book or requests to issue new books</p>
+                {% endif %}
+        </div>
+
+
+    </div>
+
+    <div class="center-column" style="width: 50%;">
+        <h2>Book Reviews</h2>
+        <div class="table-container">
+            <table class="table table-dark table-hover table-borderless">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>User</th>
+                        <th>Review</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in book.reviews if review.reviews %}
+                    <tr>
+                        <td>{{ review.user.username if review.user else 'Unknown User' }}</td>
+                        <td>{{ review.reviews }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Add Review</h3>
+        <form action="/add_review/{{ book.id }}" method="post">
+            <div>
+                <label for="rating">Rating:</label><br>
+                <div class="star-rating">
+                    <input type="radio" id="rating1" name="rating" value="1" required>
+                    <label for="rating1">&#9733;</label>
+
+                    <input type="radio" id="rating2" name="rating" value="2">
+                    <label for="rating2">&#9733;</label>
+
+                    <input type="radio" id="rating3" name="rating" value="3">
+                    <label for="rating3">&#9733;</label>
+
+                    <input type="radio" id="rating4" name="rating" value="4">
+                    <label for="rating4">&#9733;</label>
+
+                    <input type="radio" id="rating5" name="rating" value="5">
+                    <label for="rating5">&#9733;</label>
+                </div>
+            </div>
+            <textarea name="review" cols="30" rows="5"></textarea>
+            <button class="btn btn-outline-secondary" type="submit">Submit Review</button>
+        </form>
+    </div>
+
+
+    <!-- Right column -->
+    <div class="right-column" style="width: 30%;">
+        <h2>Ratings</h2>
+        <p>Average Rating: {{ book.rating }}</p>
+        {%if rating_percentage_list%}
+        <div id="barchart_material" style="width: 350px; height: 300px;"></div>
+        {%endif%}
+
+
+
+
+    </div>
+    <div class="return-button">
+        <a href="{{ url_for('booksdash') }}" class="btn btn-outline-light" class="return-link">
+            Return</a>
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+<!-- CSS STARTS HERE -->
+{% block style %}
+<style>
+    body {
+        background-color: #000000   !important;
+    }
+    a {
+        display: flex;
+        margin-inline: 25px;
+        width: 100%;
+    }
+
+    .container {
+        display: flex;
+        padding: 20px;
+        max-width: none;
+    }
+
+    .left-column,
+    .center-column,
+    .right-column {
+        margin-inline: 20px;
+        padding: 20px;
+        box-shadow: 0px 0px 10px grey;
+    }
+
+    .left-column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+
+    .left-column img {
+        width: 200px;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+    .left-column:hover,
+    .center-column:hover,
+    .right-column:hover {
+        scale: 1.01;
+    }
+
+    .left-column p {
+        max-height: 200px;
+        overflow-y: auto;
+        text-align: justify;
+
+        padding-right: 10px;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .issue-form {
+        width: 100%;
+    }
+
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-container {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    table th,
+    table td {
+        padding: 8px;
+    }
+
+    table th {
+        background-color: #f2f2f2;
+    }
+
+    form {
+        margin-top: 20px;
+    }
+
+    .star-rating input[type="radio"] {
+        display: none;
+    }
+
+    .star-rating label {
+        font-size: 24px;
+        color: gold;
+        cursor: pointer;
+    }
+
+    .star-rating input[type="radio"]:checked+label {
+        color: blue;
+    }
+
+    input[type="number"] {
+        margin-top: 10px;
+        width: 70%;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: rgb(54, 54, 54);
+        display: inline;
+        height: 40px;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 10px;
+        background-color: rgb(54, 54, 54);
+        color: white;
+    }
+
+    .center-column button {
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    p {
+        margin-bottom: 10px;
+    }
+
+    .return-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        margin-right: 50px;
+    }
+</style>
+
+{% endblock %}
+
+{%block script%}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['bar'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    var rating_percentage_list = [
+        ['Rating', 'Percentage'],
+        {% for item in rating_percentage_list[0:] %}
+    {{ item | tojson }},
+    {% endfor %}];
+
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable(rating_percentage_list);
+
+        var options = {
+            bars: 'horizontal', backgroundColor: { fill: "transparent" }, legend: { position: 'none' }, 'chartArea': { left: 10, top: 20, 'width': '90%', 'height': '80%', 'backgroundColor': { 'fill': 'transparent' } }, hAxis: {
+                gridlines: {
+                    color: 'transparent'
+                }
+            }, titleTextStyle: { color: '#FFF' }, vAxis: { textStyle: { color: '#FFF' } }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('barchart_material'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+    }
+</script>
+{%endblock%}

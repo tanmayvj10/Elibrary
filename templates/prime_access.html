@@ -1,0 +1,125 @@
+{% extends 'admin_layout.html' %}
+
+{% block title %}
+Prime Access
+{% endblock %}
+
+{% block content %}
+
+<div class="navbar" id="navbar">
+    <div id="incontainer">
+        <div id="heading">
+            <h4>ELIBRARY</h4>
+        </div>
+        <div id="dashhead">
+            <h3><i>ADMIN DASHBOARD</i></h3>
+        </div>
+        <div id="nav"><a href="/admin_profile" class="btn btn-outline-light">PROFILE</a>
+            <a href="/prime_access" class="btn btn-light"><b>PRIME ACCESS</b></a>
+            <a href="/admin_dashboard" class="btn btn-outline-light">HOME</a>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container">
+    <div class="left-column">
+        <h2>Prime Members</h2>
+        {%if prime_users_details %}
+        <table class="table table-hover table-dark" class="prime-members-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for prime_user in prime_users_details %}
+                <tr>
+                    <td>{{ prime_user.username }}</td>
+                    <td>
+                        <form action="/revoke_access/{{ prime_user.user_id }}" method="post"
+                            onsubmit="return confirm('Are you sure you want to revoke ?');">
+                            <button type="submit" class="btn btn-danger">Revoke Access</button>
+                        </form>
+                    </td>
+                    {% endfor %}
+                    {%else%}
+                    no user
+                    {%endif%}
+            </tbody>
+        </table>
+    </div>
+    <div class="right-column">
+        <h2>Users Awaiting Prime Access</h2>
+        {%if prime_req_users_details%}
+        <table class="table table-hover table-dark" class="prime-req-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req_user in prime_req_users_details %}
+                <tr>
+                    <td>{{ req_user.username }}</td>
+                    <td>
+                        <form action="/grant_access/{{ req_user.user_id }}" method="post">
+                            <button type="submit">Grant Access</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                {%else%}
+                no new requests
+                {%endif%}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .container {
+        display: flex;
+    }
+
+    .left-column,
+    .right-column {
+        flex: 1;
+        padding: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th,
+    td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    button {
+        padding: 5px 10px;
+        border: none;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}
