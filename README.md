@@ -1,9 +1,3 @@
-In a traditional Markdown README.md file, you cannot implement such dynamic behavior directly since Markdown itself does not support interactive elements like hiding/showing content based on user interaction. However, you can achieve this effect using HTML details and summary tags within the Markdown file. This approach is compatible with GitHub Markdown rendering and allows for collapsible sections.
-
-Here is the updated README.md with collapsible tables for each model:
-
----
-
 # Elibrary - Library Management System
 
 Elibrary is a comprehensive web application designed to manage library operations efficiently. Built using HTML, CSS, JavaScript, Flask Framework, SQL Alchemy, SQLite, and Python, it provides interfaces for users, librarians, and administrators, each with distinct functionalities to streamline library management.
@@ -22,8 +16,6 @@ Elibrary is a comprehensive web application designed to manage library operation
 - [Future Enhancements](#future-enhancements)
 - [Constraints/Limitations](#constraints-limitations)
 - [Demo Video](#demo-video)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Introduction
 
@@ -257,3 +249,35 @@ To install and run Elibrary on your local machine:
    ```
 
 5. Run the application:
+
+
+   ```sh
+   flask run
+   ```
+
+## Usage
+
+After starting the application, navigate to `http://localhost:5000` in your web browser to access the Elibrary system.
+
+## Utilities and Use Cases
+
+Elibrary can be used by educational institutions, public libraries, and private collections to manage their book inventory, subscriptions, and user interactions effectively. The web application provides a user-friendly interface for different roles, ensuring efficient library operations.
+
+## Future Enhancements
+
+- **Enhanced Search Functionality**: Implement advanced search filters for books and sections.
+- **Notification System**: Add email/SMS notifications for book due dates, new arrivals, and subscription status.
+- **Mobile Responsiveness**: Improve UI for better usability on mobile devices.
+- **Machine Learning**: Integrate recommendation systems for book suggestions based on user history and preferences.
+
+## Constraints/Limitations
+
+- If a section is deleted, books under the section are also deleted.
+- A book can be deleted even if it is issued to a user.
+- The image available for each book is a default stock image until changed.
+- While adding a book to the library, it is mandatory for the librarian to upload its PDF.
+
+## Demo Video
+
+Watch the demo video [here](https://www.youtube.com/watch?v=sY6bAyTGYHs).
+
