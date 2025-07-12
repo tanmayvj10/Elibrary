@@ -2,6 +2,9 @@
 
 Elibrary is a comprehensive web application designed to manage library operations efficiently. Built using HTML, CSS, JavaScript, Flask Framework, SQL Alchemy, SQLite, and Python, it provides interfaces for users, librarians, and administrators, each with distinct functionalities to streamline library management.
 
+View Here ↓
+
+[![Watch the video](https://img.youtube.com/vi/sY6bAyTGYHs/0.jpg)](https://www.youtube.com/watch?v=sY6bAyTGYHs)
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
